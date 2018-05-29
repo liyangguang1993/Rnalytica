@@ -100,14 +100,17 @@ fit <-
               downSample(x = training[, indep],
                          y = factor(training[, dep]),
                          yname = dep)
+            training_outcome <- factor(training[, dep])
           } else if (rebalance == "up") {
             # Upsampling
             training <-
               upSample(x = training[, indep],
                        y = factor(training[, dep]),
                        yname = dep)
-          } # else no
-
+            training_outcome <- factor(training[, dep])
+          } else {# else no
+            training_outcome <- outcome[indices]
+          }
           if (classifier == "lr") {
             m <- glm(f, data = training, family = "binomial")
             importance <-
@@ -115,7 +118,7 @@ fit <-
             prob <- predict(m, testing, type = "response")
           } else if (classifier == "rf") {
             m <- randomForest(x = training[, indep],
-                              y = outcome[indices],
+                              y = training_outcome,
                               ntree = classifier.params$rf.ntree)
             prob <-
               predict(m, newdata = testing[, indep], type = 'prob')[, "TRUE"]
