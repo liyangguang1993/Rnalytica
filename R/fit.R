@@ -75,7 +75,7 @@ fit <-
     # Generate model formula
     f <-
       as.formula(paste0(dep, " ~ ", paste0(indep, collapse = "+")))
-    
+    full.model <- NULL
     if (validation != 'no') {
       # boot and cv
       for (r in 1:repeats) {
@@ -120,6 +120,7 @@ fit <-
             m <- randomForest(x = training[, indep],
                               y = training_outcome,
                               ntree = classifier.params$rf.ntree)
+            full.model <- m
             prob <-
               predict(m, newdata = testing[, indep], type = 'prob')[, "TRUE"]
             importance <-
@@ -180,9 +181,10 @@ fit <-
     if (classifier == "lr") {
       full.model <- glm(f, data = data, family = "binomial")
     } else if (classifier == "rf") {
-      full.model <- randomForest(x = data[, indep],
-                                 y = outcome,
-                                 ntree = classifier.params$rf.ntree)
+      #full.model <- randomForest(x = data[, indep],
+      #                           y = outcome,
+      #                           ntree = classifier.params$rf.ntree)
+      full.model <- full.model
     } else if (classifier == "c5.0") {
       full.model <- C5.0(data[, indep],
                          outcome,
